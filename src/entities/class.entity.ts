@@ -1,18 +1,28 @@
+
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+
 import { Teacher } from './teacher.entity';
 import { Registration } from './registration.entity';
 import { ClassFee } from './class-fee.entity';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
+import { Subject } from './subject.entity';
 
 @Entity()
 export class ClassEntity {
     @PrimaryGeneratedColumn()
-    id!: number;
+    class_id!: number;
+
+    @Column()
+    class_name!: string;
 
     @ManyToOne(() => Teacher, teacher => teacher.classes, { eager: true })
     teacher!: Teacher;
 
-    @Column()
-    subject!: string;
+    @Column({ type: 'int', nullable: true })
+    subject!: number;
+
+    @ManyToOne(() => Subject)
+    @JoinColumn({ name: 'subject' })
+    subject_id!: Subject;
 
     @Column('decimal', { precision: 10, scale: 2 })
     registrationAmount!: number;

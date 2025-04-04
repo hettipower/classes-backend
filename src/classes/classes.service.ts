@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ClassEntity } from '../entities/class.entity';
-
 @Injectable()
 export class ClassesService {
     constructor(
@@ -19,13 +18,13 @@ export class ClassesService {
         return this.classRepository.find({ relations: ['teacher', 'registrations', 'classFees'] });
     }
 
-    async getClassById(id: number): Promise<ClassEntity> {
+    async getClassById(class_id: number): Promise<ClassEntity> {
         const classEntity = await this.classRepository.findOne({
-            where: { id },
+            where: { class_id },
             relations: ['teacher', 'registrations', 'classFees'],
         });
         if (!classEntity) {
-            throw new Error(`Class with ID ${id} not found`);
+            throw new Error(`Class with ID ${class_id} not found`);
         }
         return classEntity;
     }
