@@ -1,6 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
 import { ClassEntity } from './class.entity';
-
+import { Subject } from './subject.entity';
 @Entity()
 export class Teacher {
     @PrimaryGeneratedColumn()
@@ -15,8 +15,12 @@ export class Teacher {
     @Column()
     contactNo!: string;
 
-    @Column()
-    teachingSubject!: string;
+    @Column({ type: 'int', nullable: true })
+    teachingSubject!: number;
+
+    @ManyToOne(() => Subject)
+    @JoinColumn({ name: 'teachingSubject' })
+    subject_name!: Subject;
 
     // One teacher can have many classes
     @OneToMany(() => ClassEntity, classEntity => classEntity.teacher)
