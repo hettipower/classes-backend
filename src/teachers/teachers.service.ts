@@ -11,8 +11,9 @@ export class TeachersService {
     ) {}
 
     async createTeacher(teacherData: Partial<Teacher>): Promise<Teacher> {
-        const teacher = this.teacherRepository.create(teacherData);
-        return this.teacherRepository.save(teacher);
+        const newTeacher = this.teacherRepository.create(teacherData);
+        await this.teacherRepository.save(newTeacher);
+        return newTeacher;
     }
 
     async getAllTeachers(): Promise<Teacher[]> {
