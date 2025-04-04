@@ -7,8 +7,11 @@ import { ClassEntity } from './entities/class.entity';
 import { Registration } from './entities/registration.entity';
 import { ClassFee } from './entities/class-fee.entity';
 import { User } from './entities/user.entity';
+import { Role } from './entities/role.entity'; // Assuming you have a Role entity
+
 import { TeachersModule } from './teachers/teachers.module';
 import { ClassesModule } from './classes/classes.module';
+import { AuthModule } from './auth/auth.module';
 
 import 'dotenv/config';
 
@@ -25,11 +28,19 @@ import 'dotenv/config';
       username: process.env.DB_USER,
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
-      entities: [Teacher, ClassEntity, Registration, ClassFee, User],
+      entities: [
+        Teacher, 
+        ClassEntity, 
+        Registration, 
+        ClassFee, 
+        User, 
+        Role
+      ],
       synchronize: false, // Use migrations in production
     }),
     TeachersModule,
     ClassesModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
