@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Teacher } from '../entities/teacher.entity';
 import { Subject } from '../entities/subject.entity';
 import { CreateTeacherDto } from '../dto/teacher.dto';
+import { In } from 'typeorm';
 
 
 @Injectable()
@@ -19,7 +20,7 @@ export class TeachersService {
         const { subjects: subjectIds, ...teacherDetails } = teacherData;
         
         // Find all subjects by their IDs
-        const subjects = await this.subjectRepository.findByIds(subjectIds);
+        const subjects = await this.subjectRepository.findBy({ subject_id: In(subjectIds) });
         if (subjects.length !== subjectIds.length) {
             throw new Error('One or more subject IDs are invalid');
         }
