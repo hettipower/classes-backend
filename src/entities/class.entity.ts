@@ -30,6 +30,9 @@ export class ClassEntity {
     @Column('decimal', { precision: 10, scale: 2 })
     classFeeAmount!: number;
 
+    @Column('decimal', { precision: 10, scale: 2 })
+    commission!: number;
+
     @OneToMany(() => Registration, registration => registration.classEntity, { cascade: true })
     registrations!: Registration[];
 
