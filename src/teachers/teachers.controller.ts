@@ -4,6 +4,7 @@ import { Teacher } from '../entities/teacher.entity';
 import { JoiValidationPipe } from '../common/joi-validation.pipe';
 import { CreateTeacherSchema } from '../validation/teacher.validation';
 import { successResponse, errorResponse } from '../common/response.util';
+import { CreateTeacherDto } from '../dto/teacher.dto';
 
 @Controller('teachers')
 export class TeachersController {
@@ -11,7 +12,7 @@ export class TeachersController {
 
     @Post('create')
     @UsePipes(new JoiValidationPipe(CreateTeacherSchema))
-    async createTeacher(@Body() teacherData: Teacher) {
+    async createTeacher(@Body() teacherData: CreateTeacherDto) {
         try {
             const teacherDataReturnData = await this.teachersService.createTeacher(teacherData);
             return successResponse(teacherDataReturnData, 'The teacher has been created successfully.', 200);
@@ -36,7 +37,6 @@ export class TeachersController {
     }
     
     private handleError(error: any) {
-
         if (error instanceof BadRequestException) {
             const validationErrors = error.getResponse();
             return errorResponse(

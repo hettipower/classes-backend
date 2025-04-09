@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn, ManyToOne, ManyToMany, JoinTable } from 'typeorm';
 import { ClassEntity } from './class.entity';
 import { Subject } from './subject.entity';
+
 @Entity()
 export class Teacher {
     @PrimaryGeneratedColumn()
@@ -15,12 +16,19 @@ export class Teacher {
     @Column()
     contactNo!: string;
 
-    @Column({ type: 'int', nullable: true })
-    teachingSubject!: number;
-
-    @ManyToOne(() => Subject)
-    @JoinColumn({ name: 'teachingSubject' })
-    subject_name!: Subject;
+    @ManyToMany(() => Subject)
+    @JoinTable({
+        name: 'teacher_subjects',
+        joinColumn: {
+            name: 'teacher_id',
+            referencedColumnName: 'id'
+        },
+        inverseJoinColumn: {
+            name: 'subject_id',
+            referencedColumnName: 'subject_id'
+        }
+    })
+    subjects!: Subject[];
 
     // One teacher can have many classes
     @OneToMany(() => ClassEntity, classEntity => classEntity.teacher)
