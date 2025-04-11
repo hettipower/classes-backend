@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { ClassEntity } from './class.entity';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
 export class ClassFee {
@@ -11,7 +10,4 @@ export class ClassFee {
 
     @Column()
     count!: number;
-
-    @ManyToOne(() => ClassEntity, classEntity => classEntity.classFees)
-    classEntity!: ClassEntity;
 }
