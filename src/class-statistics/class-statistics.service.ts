@@ -70,4 +70,8 @@ export class ClassStatisticsService {
             order: { date: 'DESC' },
         });
     }
+
+    async getAllClassStatistics(): Promise<ClassStatistics[]> {
+        return this.classStatisticsRepository.find({ relations: ['teacher', 'class'] });
+    }
 } 

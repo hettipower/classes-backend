@@ -74,6 +74,19 @@ export class ClassStatisticsController {
         }
     }
 
+    @Get('all')
+    @ApiOperation({ summary: 'Get all class statistics' })
+    @ApiBearerAuth()
+    @ApiResponse({ status: 200, description: 'List of all class statistics' })
+    async getAllStatistics() {
+        try {
+            const statistics = await this.classStatisticsService.getAllClassStatistics();
+            return successResponse(statistics, 'All class statistics fetched successfully', 200);
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
     private handleError(error: any) {
         if (error instanceof BadRequestException) {
             return errorResponse('Validation failed', 'Bad Request', 400);
