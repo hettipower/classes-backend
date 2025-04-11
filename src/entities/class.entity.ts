@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn } from 'typeorm';
 
 import { Teacher } from './teacher.entity';
 import { Subject } from './subject.entity';
@@ -26,4 +26,7 @@ export class ClassEntity {
 
     @Column('decimal', { precision: 10, scale: 2 })
     commission!: number;
+
+    @CreateDateColumn()
+    createdAt!: Date;
 }
