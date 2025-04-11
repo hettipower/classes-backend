@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Param, UsePipes, BadRequestException } from '@nestjs/common';
+
 import { TeachersService } from './teachers.service';
-import { Teacher } from '../entities/teacher.entity';
 import { JoiValidationPipe } from '../common/joi-validation.pipe';
 import { CreateTeacherSchema } from '../validation/teacher.validation';
 import { successResponse, errorResponse } from '../common/response.util';
@@ -32,7 +32,7 @@ export class TeachersController {
     }
 
     @Get(':id')
-    async findOne(@Param('id') id: number): Promise<Teacher> {
+    async findOne(@Param('id') id: number): Promise<CreateTeacherDto> {
         return this.teachersService.getTeacherById(id);
     }
     

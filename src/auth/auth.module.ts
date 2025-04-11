@@ -1,23 +1,18 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
-
-import { User } from '../entities/user.entity';
-import { Role } from '../entities/role.entity';
 
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
+import { SupabaseService } from '../common/supabase.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Role]),
     JwtModule.register({
-      secret: '4863d452b00a241824cd59c78ae2802d', // Replace with your actual secret key
-      signOptions: { expiresIn: '60s' }, // Optional: Set token expiration
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '60s' },
     }),
   ],
-  providers: [AuthService],
-  controllers: [AuthController], 
-  exports: [TypeOrmModule],
+  providers: [AuthService, SupabaseService],
+  controllers: [AuthController],
 })
 export class AuthModule {}

@@ -1,32 +1,35 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { ClassEntity } from '../entities/class.entity';
+import { SupabaseService } from '../common/supabase.service';
+import { CreateClassDto } from '../dto/class.dto';
 
 @Injectable()
 export class ClassesService {
-    constructor(
-        @InjectRepository(ClassEntity)
-        private classRepository: Repository<ClassEntity>,
-    ) {}
+    constructor(private readonly supabaseService: SupabaseService) {}
 
-    async createClass(classData: Partial<ClassEntity>): Promise<ClassEntity> {
-        const classEntity = this.classRepository.create(classData);
-        return this.classRepository.save(classEntity);
+    async createClass(classData: CreateClassDto) {
+        const response = await this.supabaseService.insert<CreateClassDto>('classes', classData);
+        if (response.error) {
+            throw new Error('Error creating class');
+        }
+        return response.data[0];
     }
 
-    async getAllClasses(): Promise<ClassEntity[]> {
-        return this.classRepository.find({ relations: ['teacher', 'subject'] });
+    async getAllClasses() {
+        const response = await this.supabaseService.query<CreateClassDto>('classes', '*');
+        if (response.error) {
+            throw new Error('Error fetching classes');
+        }
+        return response.data;
     }
 
-    async getClassById(class_id: number): Promise<ClassEntity> {
-        const classEntity = await this.classRepository.findOne({
-            where: { class_id },
-            relations: ['teacher','subject'],
-        });
-        if (!classEntity) {
+    async getClassById(class_id: number) {
+        const response = await this.supabaseService.query<CreateClassDto>('classes', '*', { class_id });
+        if (response.error) {
+            throw new Error('Error fetching class');
+        }
+        if (!response.data || response.data.length === 0) {
             throw new Error(`Class with ID ${class_id} not found`);
         }
-        return classEntity;
+        return response.data[0];
     }
 }

@@ -1,73 +1,69 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
-import { ClassStatistics } from '../entities/class-statistics.entity';
-import { Teacher } from '../entities/teacher.entity';
+
+import { SupabaseService } from '../common/supabase.service';
+import { ClassStatisticsDto } from '../dto/class-statistics.dto';
 
 @Injectable()
 export class ClassStatisticsService {
-    constructor(
-        @InjectRepository(ClassStatistics)
-        private classStatisticsRepository: Repository<ClassStatistics>,
-    ) {}
+    constructor(private readonly supabaseService: SupabaseService) {}
 
-    async createOrUpdateStatistics(data: {
-        teacherId: number;
-        classId: number;
-        date: Date;
-        totalRegistrations: number;
-        totalClassFee: number;
-    }): Promise<ClassStatistics> {
-        const existingStats = await this.classStatisticsRepository.findOne({
-            where: {
-                teacher: { id: data.teacherId },
-                class: { class_id: data.classId },
-                date: data.date,
-            },
+    async createOrUpdateStatistics(data: ClassStatisticsDto): Promise<ClassStatisticsDto> {
+        const { teacherId, classId, date, totalRegistrations, totalClassFee } = data;
+        
+        const response = await this.supabaseService.insert<ClassStatisticsDto>('class_statistics', {
+            teacher_id: teacherId,
+            class_id: classId,
+            date,
+            totalRegistrations,
+            totalClassFee
         });
 
-        if (existingStats) {
-            existingStats.totalRegistrations = data.totalRegistrations;
-            existingStats.totalClassFee = data.totalClassFee;
-            return this.classStatisticsRepository.save(existingStats);
+        if (response.error) {
+            throw new Error('Error creating/updating statistics');
         }
 
-        const newStats = this.classStatisticsRepository.create({
-            teacher: { id: data.teacherId },
-            class: { class_id: data.classId },
-            date: data.date,
-            totalRegistrations: data.totalRegistrations,
-            totalClassFee: data.totalClassFee,
-        });
-
-        return this.classStatisticsRepository.save(newStats);
+        return response.data[0];
     }
 
-    async getTeacherClassStatistics(teacherId: number, startDate?: Date, endDate?: Date): Promise<ClassStatistics[]> {
-        const where: any = { teacher: { id: teacherId } };
+    async getTeacherClassStatistics(teacherId: number, startDate?: Date, endDate?: Date): Promise<ClassStatisticsDto[]> {
+        let query = this.supabaseService.query<ClassStatisticsDto>('class_statistics', '*', { teacher_id: teacherId });
         
         if (startDate && endDate) {
-            where.date = Between(startDate, endDate);
+            query = this.supabaseService.query<ClassStatisticsDto>(
+                'class_statistics',
+                '*',
+                { 
+                    teacher_id: teacherId,
+                    date: { gte: startDate, lte: endDate }
+                }
+            );
         }
 
-        return this.classStatisticsRepository.find({
-            where,
-            relations: ['class', 'teacher'],
-            order: { date: 'DESC' },
-        });
+        const response = await query;
+        if (response.error) {
+            throw new Error('Error fetching teacher statistics');
+        }
+        return response.data;
     }
 
-    async getClassStatistics(classId: number, startDate?: Date, endDate?: Date): Promise<ClassStatistics[]> {
-        const where: any = { class: { class_id: classId } };
+    async getClassStatistics(classId: number, startDate?: Date, endDate?: Date): Promise<ClassStatisticsDto[]> {
+        let query = this.supabaseService.query<ClassStatisticsDto>('class_statistics', '*', { class_id: classId });
         
         if (startDate && endDate) {
-            where.date = Between(startDate, endDate);
+            query = this.supabaseService.query<ClassStatisticsDto>(
+                'class_statistics',
+                '*',
+                { 
+                    class_id: classId,
+                    date: { gte: startDate, lte: endDate }
+                }
+            );
         }
 
-        return this.classStatisticsRepository.find({
-            where,
-            relations: ['teacher', 'class'],
-            order: { date: 'DESC' },
-        });
+        const response = await query;
+        if (response.error) {
+            throw new Error('Error fetching class statistics');
+        }
+        return response.data;
     }
 } 

@@ -1,10 +1,11 @@
 import { Controller, Get, Post, Body, Param, UsePipes, BadRequestException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+
 import { ClassesService } from './classes.service';
-import { ClassEntity } from '../entities/class.entity';
 import { JoiValidationPipe } from '../common/joi-validation.pipe';
 import { CreateClassSchema } from '../validation/class.validation';
 import { successResponse, errorResponse } from '../common/response.util';
+import { CreateClassDto } from '../dto/class.dto';
 
 @ApiTags('classes')
 @Controller('classes')
@@ -14,11 +15,18 @@ export class ClassesController {
     @Post('create')
     @ApiOperation({ summary: 'Create a new class' })
     @ApiBearerAuth()
-    @ApiBody({ type: ClassEntity })
+    @ApiBody({ schema: { type: 'object', properties: {
+        class_name: { type: 'string' },
+        teacher_id: { type: 'number' },
+        subject_id: { type: 'number' },
+        registrationAmount: { type: 'number' },
+        classFeeAmount: { type: 'number' },
+        commission: { type: 'number' }
+    }}})
     @ApiResponse({ status: 201, description: 'Class created successfully' })
     @ApiResponse({ status: 400, description: 'Bad request' })
     @UsePipes(new JoiValidationPipe(CreateClassSchema))
-    async createClass(@Body() classData: ClassEntity) {
+    async createClass(@Body() classData: CreateClassDto) {
         try {
             const classDataReturnData = await this.classesService.createClass(classData);
             return successResponse(classDataReturnData, 'The class has been created successfully.', 200);
@@ -46,7 +54,7 @@ export class ClassesController {
     @ApiBearerAuth()
     @ApiResponse({ status: 200, description: 'Class details' })
     @ApiResponse({ status: 404, description: 'Class not found' })
-    async findOne(@Param('id') id: number): Promise<ClassEntity> {
+    async findOne(@Param('id') id: number): Promise<CreateClassDto> {
         return this.classesService.getClassById(id);
     }
     

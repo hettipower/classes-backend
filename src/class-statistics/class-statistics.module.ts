@@ -1,14 +1,12 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { ClassStatistics } from '../entities/class-statistics.entity';
 import { ClassStatisticsController } from './class-statistics.controller';
 import { ClassStatisticsService } from './class-statistics.service';
+import { SupabaseService } from '../common/supabase.service';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([ClassStatistics])],
     controllers: [ClassStatisticsController],
-    providers: [ClassStatisticsService],
+    providers: [ClassStatisticsService, SupabaseService],
     exports: [ClassStatisticsService],
 })
 export class ClassStatisticsModule {}

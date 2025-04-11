@@ -1,52 +1,43 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Teacher } from '../entities/teacher.entity';
-import { Subject } from '../entities/subject.entity';
-import { CreateTeacherDto } from '../dto/teacher.dto';
-import { In } from 'typeorm';
 
+import { SupabaseService } from '../common/supabase.service';
+import { CreateTeacherDto } from '../dto/teacher.dto';
 
 @Injectable()
 export class TeachersService {
-    constructor(
-        @InjectRepository(Teacher)
-        private teacherRepository: Repository<Teacher>,
-        @InjectRepository(Subject)
-        private subjectRepository: Repository<Subject>,
-    ) {}
+  constructor(private readonly supabaseService: SupabaseService) {}
 
-    async createTeacher(teacherData: CreateTeacherDto): Promise<Teacher> {
-        const { subjects: subjectIds, ...teacherDetails } = teacherData;
-        
-        // Find all subjects by their IDs
-        const subjects = await this.subjectRepository.findBy({ subject_id: In(subjectIds) });
-        if (subjects.length !== subjectIds.length) {
-            throw new Error('One or more subject IDs are invalid');
-        }
+  async createTeacher(teacherData: CreateTeacherDto): Promise<CreateTeacherDto> {
+    const { subjects: subjectIds, ...teacherDetails } = teacherData;
+    
+    const response = await this.supabaseService.insert<CreateTeacherDto>('teachers', {
+      ...teacherDetails,
+      subjects: subjectIds
+    });
 
-        // Create teacher with subjects
-        const newTeacher = this.teacherRepository.create({
-            ...teacherDetails,
-            subjects
-        });
-
-        await this.teacherRepository.save(newTeacher);
-        return newTeacher;
+    if (response.error) {
+      throw new Error('Error creating teacher');
     }
 
-    async getAllTeachers(): Promise<Teacher[]> {
-        return this.teacherRepository.find({ relations: ['subjects'] });
-    }
+    return response.data[0];
+  }
 
-    async getTeacherById(id: number): Promise<Teacher> {
-        const teacher = await this.teacherRepository.findOne({ 
-            where: { id },
-            relations: ['subjects']
-        });
-        if (!teacher) {
-            throw new Error(`Teacher with id ${id} not found`);
-        }
-        return teacher;
+  async getAllTeachers(): Promise<CreateTeacherDto[]> {
+    const response = await this.supabaseService.query<CreateTeacherDto>('teachers', '*');
+    if (response.error) {
+      throw new Error('Error fetching teachers');
     }
+    return response.data;
+  }
+
+  async getTeacherById(id: number): Promise<CreateTeacherDto> {
+    const response = await this.supabaseService.query<CreateTeacherDto>('teachers', '*', { id });
+    if (response.error) {
+      throw new Error('Error fetching teacher');
+    }
+    if (!response.data || response.data.length === 0) {
+      throw new Error(`Teacher with id ${id} not found`);
+    }
+    return response.data[0];
+  }
 }

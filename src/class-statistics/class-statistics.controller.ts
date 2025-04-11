@@ -1,7 +1,8 @@
 import { Controller, Get, Post, Body, Param, Query, UsePipes, BadRequestException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+
 import { ClassStatisticsService } from './class-statistics.service';
-import { ClassStatistics } from '../entities/class-statistics.entity';
+import { ClassStatisticsDto } from '../dto/class-statistics.dto';
 import { successResponse, errorResponse } from '../common/response.util';
 
 @ApiTags('class-statistics')
@@ -13,13 +14,7 @@ export class ClassStatisticsController {
     @ApiOperation({ summary: 'Create or update class statistics' })
     @ApiBearerAuth()
     @ApiResponse({ status: 200, description: 'Statistics updated successfully' })
-    async updateStatistics(@Body() data: {
-        teacherId: number;
-        classId: number;
-        date: Date;
-        totalRegistrations: number;
-        totalClassFee: number;
-    }) {
+    async updateStatistics(@Body() data: ClassStatisticsDto) {
         try {
             const result = await this.classStatisticsService.createOrUpdateStatistics(data);
             return successResponse(result, 'Class statistics updated successfully', 200);

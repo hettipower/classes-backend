@@ -1,10 +1,10 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, UsePipes, BadRequestException } from '@nestjs/common';
+
 import { SubjectsService } from './subjects.service';
-import { Subject } from '../entities/subject.entity';
+import { SubjectDto } from '../dto/subject.dto';
 import { JoiValidationPipe } from '../common/joi-validation.pipe';
 import { CreateSubjectSchema } from '../validation/subject.validation';
 import { successResponse, errorResponse } from '../common/response.util';
-
 
 @Controller('subjects')
 export class SubjectsController {
@@ -12,7 +12,7 @@ export class SubjectsController {
 
     @Post('create')
     @UsePipes(new JoiValidationPipe(CreateSubjectSchema))
-    async createSubject(@Body() subjectData: Subject) {
+    async createSubject(@Body() subjectData: SubjectDto) {
         try {
             const subjectDataReturnData = await this.subjectsService.createSubject(subjectData.subject_name);
             return successResponse(subjectDataReturnData, 'The subject has been created successfully.', 200);
@@ -32,7 +32,7 @@ export class SubjectsController {
     }
 
     @Get(':id')
-    findOne(@Param('id') id: string): Promise<Subject> {
+    findOne(@Param('id') id: string): Promise<SubjectDto> {
         return this.subjectsService.findOne(Number(id));
     }
 
@@ -40,7 +40,7 @@ export class SubjectsController {
     update(
         @Param('id') id: string,
         @Body('subject_name') subject_name: string,
-    ): Promise<Subject> {
+    ): Promise<SubjectDto> {
         return this.subjectsService.update(Number(id), subject_name);
     }
 
@@ -50,7 +50,6 @@ export class SubjectsController {
     }
 
     private handleError(error: any) {
-
         if (error instanceof BadRequestException) {
             const validationErrors = error.getResponse();
             return errorResponse(
