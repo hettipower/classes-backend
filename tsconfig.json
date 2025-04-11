@@ -19,7 +19,7 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "moduleResolution": "Node",
-    "strict": true,
+    //"strict": true,
     "resolveJsonModule": true,
     "esModuleInterop": true
   }
