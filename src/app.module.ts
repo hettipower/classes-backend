@@ -4,8 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 
 import { Teacher } from './entities/teacher.entity';
 import { ClassEntity } from './entities/class.entity';
-import { Registration } from './entities/registration.entity';
-import { ClassFee } from './entities/class-fee.entity';
+import { ClassStatistics } from './entities/class-statistics.entity';
 import { User } from './entities/user.entity';
 import { Role } from './entities/role.entity';
 import { Subject } from './entities/subject.entity';
@@ -14,6 +13,7 @@ import { TeachersModule } from './teachers/teachers.module';
 import { ClassesModule } from './classes/classes.module';
 import { AuthModule } from './auth/auth.module';
 import { SubjectsModule } from './subjects/subjects.module';
+import { ClassStatisticsModule } from './class-statistics/class-statistics.module';
 
 import 'dotenv/config';
 
@@ -32,9 +32,8 @@ import 'dotenv/config';
       database: process.env.DB_NAME,
       entities: [
         Teacher, 
-        ClassEntity, 
-        Registration, 
-        ClassFee, 
+        ClassEntity,  
+        ClassStatistics, 
         User, 
         Role,
         Subject
@@ -45,6 +44,7 @@ import 'dotenv/config';
     ClassesModule,
     AuthModule,
     SubjectsModule,
+    ClassStatisticsModule,
   ],
 })
 export class AppModule {}
