@@ -49,4 +49,17 @@ export class TeachersService {
         }
         return teacher;
     }
+
+    async getTeacherSubjects(teacherId: number): Promise<Subject[]> {
+        const teacher = await this.teacherRepository.findOne({
+            where: { id: teacherId },
+            relations: ['subjects'],
+        });
+
+        if (!teacher) {
+            throw new Error(`Teacher with ID ${teacherId} not found`);
+        }
+
+        return teacher.subjects;
+    }
 }
